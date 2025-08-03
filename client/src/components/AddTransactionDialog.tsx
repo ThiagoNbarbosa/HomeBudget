@@ -184,12 +184,18 @@ export default function AddTransactionDialog({
                 <FormItem>
                   <FormLabel>Valor (R$)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0,00"
-                      {...field}
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        R$
+                      </span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0,00"
+                        className="pl-10"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,26 +208,20 @@ export default function AddTransactionDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categoria</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma categoria" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
+                  <FormControl>
+                    <select
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="">Selecione uma categoria</option>
                       {filteredCategories.map((category: any) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          <div className="flex items-center space-x-2">
-                            <i 
-                              className={`${category.icon} text-sm`}
-                              style={{ color: category.color }}
-                            />
-                            <span>{category.name}</span>
-                          </div>
-                        </SelectItem>
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
