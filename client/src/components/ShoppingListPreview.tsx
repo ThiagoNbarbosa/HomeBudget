@@ -102,7 +102,7 @@ export default function ShoppingListPreview({ householdId }: ShoppingListPreview
   }
 
   // Show only unpurchased items, sorted by priority
-  const unpurchasedItems = shoppingItems?.filter((item: any) => !item.purchased) || [];
+  const unpurchasedItems = (shoppingItems as any[])?.filter((item: any) => !item.purchased) || [];
   const sortedItems = unpurchasedItems
     .sort((a: any, b: any) => {
       const priorityOrder = { high: 3, medium: 2, low: 1 };

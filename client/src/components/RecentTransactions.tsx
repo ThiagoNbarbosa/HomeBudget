@@ -71,8 +71,8 @@ export default function RecentTransactions({ householdId }: RecentTransactionsPr
       </div>
       
       <div className="space-y-3">
-        {transactions && transactions.length > 0 ? (
-          transactions.map((transaction: any) => (
+        {transactions && (transactions as any[]).length > 0 ? (
+          (transactions as any[]).map((transaction: any) => (
             <Card key={transaction.id} className="shadow-sm border border-gray-100">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">

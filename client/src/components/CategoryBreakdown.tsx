@@ -67,7 +67,7 @@ export default function CategoryBreakdown({ householdId }: CategoryBreakdownProp
     );
   }
 
-  const expenseBudgets = budgets?.filter((budget: any) => budget.category.type === "expense") || [];
+  const expenseBudgets = (budgets as any[])?.filter((budget: any) => budget.category.type === "expense") || [];
 
   return (
     <section className="px-4 py-6 bg-gray-50">

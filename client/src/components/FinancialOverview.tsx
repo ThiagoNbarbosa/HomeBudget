@@ -35,9 +35,9 @@ export default function FinancialOverview({ householdId }: FinancialOverviewProp
     );
   }
 
-  const currentBalance = analytics?.currentBalance || 0;
-  const totalIncome = analytics?.totalIncome || 0;
-  const totalExpenses = analytics?.totalExpenses || 0;
+  const currentBalance = (analytics as any)?.currentBalance || 0;
+  const totalIncome = (analytics as any)?.totalIncome || 0;
+  const totalExpenses = (analytics as any)?.totalExpenses || 0;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("pt-BR", {
