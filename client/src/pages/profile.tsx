@@ -37,7 +37,7 @@ export default function Profile() {
 
   // Get household members
   const { data: members, isLoading: membersLoading } = useQuery({
-    queryKey: ["/api/households", household?.id, "members"],
+    queryKey: [`/api/households/${household?.id}/members`],
     enabled: !!household?.id,
     retry: (failureCount, error) => {
       if (isUnauthorizedError(error as Error)) return false;

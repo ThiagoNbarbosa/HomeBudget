@@ -10,7 +10,7 @@ interface FinancialOverviewProps {
 
 export default function FinancialOverview({ householdId }: FinancialOverviewProps) {
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ["/api/households", householdId, "analytics"],
+    queryKey: [`/api/households/${householdId}/analytics`],
     enabled: !!householdId,
     retry: (failureCount, error) => {
       if (isUnauthorizedError(error as Error)) return false;

@@ -14,7 +14,7 @@ export default function CategoryBreakdown({ householdId }: CategoryBreakdownProp
   const currentYear = new Date().getFullYear();
 
   const { data: budgets, isLoading } = useQuery({
-    queryKey: ["/api/households", householdId, "budgets", { month: currentMonth, year: currentYear }],
+    queryKey: [`/api/households/${householdId}/budgets?month=${currentMonth}&year=${currentYear}`],
     enabled: !!householdId,
     retry: (failureCount, error) => {
       if (isUnauthorizedError(error as Error)) return false;

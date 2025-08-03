@@ -35,7 +35,7 @@ export default function Goals() {
 
   // Get budget goals
   const { data: budgets, isLoading: budgetsLoading } = useQuery({
-    queryKey: ["/api/households", household?.id, "budgets"],
+    queryKey: [`/api/households/${household?.id}/budgets`],
     enabled: !!household?.id,
     retry: (failureCount, error) => {
       if (isUnauthorizedError(error as Error)) return false;

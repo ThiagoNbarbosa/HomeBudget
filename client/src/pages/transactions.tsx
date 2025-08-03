@@ -39,7 +39,7 @@ export default function Transactions() {
 
   // Get transactions
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
-    queryKey: ["/api/households", household?.id, "transactions"],
+    queryKey: [`/api/households/${household?.id}/transactions`],
     enabled: !!household?.id,
     retry: (failureCount, error) => {
       if (isUnauthorizedError(error as Error)) return false;
