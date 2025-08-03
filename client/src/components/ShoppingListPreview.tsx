@@ -16,7 +16,7 @@ export default function ShoppingListPreview({ householdId }: ShoppingListPreview
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const { data: shoppingItems, isLoading } = useQuery({
-    queryKey: ["/api/households", householdId, "shopping"],
+    queryKey: [`/api/households/${householdId}/shopping`],
     enabled: !!householdId,
     retry: (failureCount, error) => {
       if (isUnauthorizedError(error as Error)) return false;

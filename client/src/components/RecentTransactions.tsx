@@ -13,7 +13,7 @@ interface RecentTransactionsProps {
 
 export default function RecentTransactions({ householdId }: RecentTransactionsProps) {
   const { data: transactions, isLoading } = useQuery({
-    queryKey: ["/api/households", householdId, "transactions", { limit: 5 }],
+    queryKey: [`/api/households/${householdId}/transactions?limit=5`],
     enabled: !!householdId,
     retry: (failureCount, error) => {
       if (isUnauthorizedError(error as Error)) return false;

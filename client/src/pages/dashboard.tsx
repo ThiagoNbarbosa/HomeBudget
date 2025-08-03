@@ -77,7 +77,7 @@ export default function Dashboard() {
   });
 
   const handleCreateHousehold = () => {
-    const householdName = `Casa de ${user?.firstName || "Usuário"}`;
+    const householdName = `Casa de ${(user as any)?.name || (user as any)?.firstName || "Usuário"}`;
     createHouseholdMutation.mutate({ name: householdName });
   };
 
@@ -129,11 +129,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <FinancialOverview householdId={household.id} />
-      <QuickActions householdId={household.id} />
-      <CategoryBreakdown householdId={household.id} />
-      <ShoppingListPreview householdId={household.id} />
-      <RecentTransactions householdId={household.id} />
+      <FinancialOverview householdId={(household as any)?.id} />
+      <QuickActions householdId={(household as any)?.id} />
+      <CategoryBreakdown householdId={(household as any)?.id} />
+      <ShoppingListPreview householdId={(household as any)?.id} />
+      <RecentTransactions householdId={(household as any)?.id} />
       <BottomNavigation />
     </div>
   );
