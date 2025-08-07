@@ -14,7 +14,7 @@ export default function BottomNavigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-40">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-slate-200/50 px-6 py-3 z-40 shadow-lg">
       <div className="flex justify-around items-center">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -27,8 +27,10 @@ export default function BottomNavigation() {
               size="sm"
               onClick={() => navigate(item.path)}
               className={cn(
-                "flex flex-col items-center py-2 px-3 h-auto",
-                isActive ? "text-purple-brand" : "text-gray-400 hover:text-gray-600"
+                "flex flex-col items-center py-2 px-3 h-auto rounded-xl transition-all duration-300",
+                isActive 
+                  ? "text-blue-700 bg-blue-50" 
+                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
               )}
             >
               <Icon className="w-5 h-5 mb-1" />
