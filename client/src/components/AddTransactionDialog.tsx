@@ -79,7 +79,7 @@ export default function AddTransactionDialog({
 
   // Get categories
   const { data: categories } = useQuery({
-    queryKey: ["/api/households", householdId, "categories"],
+    queryKey: [`/api/households/${householdId}/categories`],
     enabled: !!householdId && isOpen,
   });
 
@@ -93,9 +93,9 @@ export default function AddTransactionDialog({
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/households", householdId, "transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/households", householdId, "analytics"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/households", householdId, "budgets"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/households/${householdId}/transactions`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/households/${householdId}/analytics`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/households/${householdId}/budgets`] });
       
       toast({
         title: "Transação adicionada!",

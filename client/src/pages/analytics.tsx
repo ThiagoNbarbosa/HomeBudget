@@ -29,19 +29,19 @@ export default function Analytics() {
 
   // Fetch analytics data
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ["/api/households", household?.id, "analytics"],
+    queryKey: [`/api/households/${household?.id}/analytics`],
     enabled: !!household?.id,
   });
 
   // Fetch transactions for detailed analysis
   const { data: transactions } = useQuery({
-    queryKey: ["/api/households", household?.id, "transactions"],
+    queryKey: [`/api/households/${household?.id}/transactions`],
     enabled: !!household?.id,
   });
 
   // Fetch budget goals
   const { data: budgets } = useQuery({
-    queryKey: ["/api/households", household?.id, "budgets"],
+    queryKey: [`/api/households/${household?.id}/budgets`],
     enabled: !!household?.id,
   });
 

@@ -31,7 +31,7 @@ export default function Shopping() {
 
   // Fetch shopping items
   const { data: shoppingItems, isLoading } = useQuery({
-    queryKey: ["/api/households", household?.id, "shopping"],
+    queryKey: [`/api/households/${household?.id}/shopping`],
     enabled: !!household?.id,
   });
 
