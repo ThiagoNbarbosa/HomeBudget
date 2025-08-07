@@ -40,12 +40,25 @@ const incomeSubtypes = [
 ] as const;
 
 const transactionSchema = z.object({
-  description: z.string().min(1, "Descrição é obrigatória"),
-  amount: z.string().min(1, "Valor é obrigatório"),
+  description: z.string().optional(),
+  amount: z.string().optional(),
   type: z.enum(["income", "expense"]),
-  incomeSubtype: z.enum(["contra_cheque", "fgts", "descontos", "extra"]).optional(),
   categoryId: z.string().min(1, "Categoria é obrigatória"),
   householdId: z.string(),
+  // Salary specific fields
+  valorContraCheque: z.string().optional(),
+  valorFGTS: z.string().optional(),
+  valorDescontos: z.string().optional(),
+  extra: z.string().optional(),
+}).refine((data) => {
+  const selectedCategoryName = "Salário"; // This will be checked in the component
+  if (selectedCategoryName === "Salário") {
+    return (data.valorContraCheque && parseFloat(data.valorContraCheque) > 0);
+  }
+  return data.description && data.description.trim().length > 0 && data.amount && parseFloat(data.amount) > 0;
+}, {
+  message: "Preencha os campos obrigatórios",
+  path: ["description"],
 });
 
 type TransactionForm = z.infer<typeof transactionSchema>;
@@ -71,9 +84,12 @@ export default function AddTransactionDialog({
       description: "",
       amount: "",
       type: defaultType,
-      incomeSubtype: undefined,
       categoryId: "",
       householdId,
+      valorContraCheque: "",
+      valorFGTS: "",
+      valorDescontos: "",
+      extra: "",
     },
   });
 
@@ -127,11 +143,48 @@ export default function AddTransactionDialog({
   });
 
   const onSubmit = (data: TransactionForm) => {
-    createTransactionMutation.mutate(data);
+    const selectedCategory = (categories as any[])?.find(cat => cat.id === data.categoryId);
+    let finalAmount: number;
+    let finalDescription: string;
+    
+    if (selectedCategory?.name === 'Salário') {
+      const contraCheque = parseFloat(data.valorContraCheque || "0");
+      const fgts = parseFloat(data.valorFGTS || "0");
+      const descontos = parseFloat(data.valorDescontos || "0");
+      finalAmount = contraCheque + fgts - descontos;
+      
+      // Build description from salary components
+      const parts = [];
+      if (contraCheque > 0) parts.push(`Contra cheque: ${formatCurrency(contraCheque)}`);
+      if (fgts > 0) parts.push(`FGTS: ${formatCurrency(fgts)}`);
+      if (descontos > 0) parts.push(`Descontos: ${formatCurrency(descontos)}`);
+      if (data.extra) parts.push(`Extra: ${data.extra}`);
+      
+      finalDescription = `Salário - ${parts.join(', ')}`;
+    } else {
+      finalAmount = parseFloat(data.amount || "0");
+      finalDescription = data.description || "";
+    }
+    
+    createTransactionMutation.mutate({
+      ...data,
+      amount: finalAmount.toString(),
+      description: finalDescription,
+    });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(amount);
   };
 
   const watchedType = form.watch("type");
+  const watchedCategoryId = form.watch("categoryId");
   const filteredCategories = (categories as any[])?.filter((cat: any) => cat.type === watchedType) || [];
+  const selectedCategory = (categories as any[])?.find(cat => cat.id === watchedCategoryId);
+  const isSalaryCategory = selectedCategory?.name === 'Salário';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -154,7 +207,11 @@ export default function AddTransactionDialog({
                     onValueChange={(value) => {
                       field.onChange(value);
                       form.setValue("categoryId", ""); // Reset category when type changes
-                      form.setValue("incomeSubtype", undefined); // Reset income subtype
+                      // Reset salary fields
+                      form.setValue("valorContraCheque", "");
+                      form.setValue("valorFGTS", "");
+                      form.setValue("valorDescontos", "");
+                      form.setValue("extra", "");
                     }}
                     defaultValue={field.value}
                   >
@@ -173,99 +230,6 @@ export default function AddTransactionDialog({
               )}
             />
 
-            {watchedType === "income" && (
-              <FormField
-                control={form.control}
-                name="incomeSubtype"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subtipo de Receita</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o subtipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {incomeSubtypes.map((subtype) => (
-                          <SelectItem key={subtype.value} value={subtype.value}>
-                            {subtype.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Supermercado, Salário..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Valor (R$)</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                        R$
-                      </span>
-                      <Input
-                        type="text"
-                        placeholder="0,00"
-                        className="pl-10"
-                        value={field.value ? 
-                          parseFloat(field.value).toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }) : ''
-                        }
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          
-                          // Remove tudo que não é dígito
-                          value = value.replace(/\D/g, '');
-                          
-                          // Se vazio, define como 0
-                          if (!value) {
-                            field.onChange('');
-                            return;
-                          }
-                          
-                          // Converte para centavos (divide por 100)
-                          const numericValue = parseInt(value, 10) / 100;
-                          
-                          // Salva o valor numérico para o formulário
-                          field.onChange(numericValue.toString());
-                        }}
-                        onBlur={field.onBlur}
-                        name={field.name}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="categoryId"
@@ -273,7 +237,17 @@ export default function AddTransactionDialog({
                 <FormItem>
                   <FormLabel>Categoria</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        // Reset salary fields when category changes
+                        form.setValue("valorContraCheque", "");
+                        form.setValue("valorFGTS", "");
+                        form.setValue("valorDescontos", "");
+                        form.setValue("extra", "");
+                      }} 
+                      defaultValue={field.value}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione uma categoria" />
                       </SelectTrigger>
@@ -293,6 +267,239 @@ export default function AddTransactionDialog({
                 </FormItem>
               )}
             />
+
+            {!isSalaryCategory && (
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Supermercado, Conta de luz..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Salary-specific fields */}
+            {isSalaryCategory && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="valorContraCheque"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor contra cheque (R$)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                            R$
+                          </span>
+                          <Input
+                            type="text"
+                            placeholder="0,00"
+                            className="pl-10"
+                            value={field.value ? 
+                              parseFloat(field.value).toLocaleString('pt-BR', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }) : ''
+                            }
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              value = value.replace(/\D/g, '');
+                              if (!value) {
+                                field.onChange('');
+                                return;
+                              }
+                              const numericValue = parseInt(value, 10) / 100;
+                              field.onChange(numericValue.toString());
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="valorFGTS"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor FGTS (R$)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                            R$
+                          </span>
+                          <Input
+                            type="text"
+                            placeholder="0,00"
+                            className="pl-10"
+                            value={field.value ? 
+                              parseFloat(field.value).toLocaleString('pt-BR', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }) : ''
+                            }
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              value = value.replace(/\D/g, '');
+                              if (!value) {
+                                field.onChange('');
+                                return;
+                              }
+                              const numericValue = parseInt(value, 10) / 100;
+                              field.onChange(numericValue.toString());
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="valorDescontos"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor descontos (R$)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                            R$
+                          </span>
+                          <Input
+                            type="text"
+                            placeholder="0,00"
+                            className="pl-10"
+                            value={field.value ? 
+                              parseFloat(field.value).toLocaleString('pt-BR', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }) : ''
+                            }
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              value = value.replace(/\D/g, '');
+                              if (!value) {
+                                field.onChange('');
+                                return;
+                              }
+                              const numericValue = parseInt(value, 10) / 100;
+                              field.onChange(numericValue.toString());
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="extra"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Extra (opcional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Bonus, Vale alimentação..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {!isSalaryCategory && (
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Valor (R$)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                          R$
+                        </span>
+                        <Input
+                          type="text"
+                          placeholder="0,00"
+                          className="pl-10"
+                          value={field.value ? 
+                            parseFloat(field.value).toLocaleString('pt-BR', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }) : ''
+                          }
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            
+                            // Remove tudo que não é dígito
+                            value = value.replace(/\D/g, '');
+                            
+                            // Se vazio, define como 0
+                            if (!value) {
+                              field.onChange('');
+                              return;
+                            }
+                            
+                            // Converte para centavos (divide por 100)
+                            const numericValue = parseInt(value, 10) / 100;
+                            
+                            // Salva o valor numérico para o formulário
+                            field.onChange(numericValue.toString());
+                          }}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Total calculation display for salary */}
+            {isSalaryCategory && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <FormLabel className="text-blue-800 font-medium">Total Calculado</FormLabel>
+                <div className="text-2xl font-semibold text-blue-900 mt-2">
+                  {(() => {
+                    const contraCheque = parseFloat(form.watch("valorContraCheque") || "0");
+                    const fgts = parseFloat(form.watch("valorFGTS") || "0");
+                    const descontos = parseFloat(form.watch("valorDescontos") || "0");
+                    const total = contraCheque + fgts - descontos;
+                    return new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(total);
+                  })()}
+                </div>
+                <p className="text-xs text-blue-600 mt-1">
+                  Contra cheque + FGTS - Descontos
+                </p>
+              </div>
+            )}
+
+
 
             <div className="flex space-x-2 pt-4">
               <Button
