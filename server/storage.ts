@@ -53,6 +53,10 @@ export interface IStorage {
   getHouseholdShoppingItems(householdId: string): Promise<(ShoppingItem & { user: User })[]>;
   createShoppingItem(item: InsertShoppingItem): Promise<ShoppingItem>;
   updateShoppingItem(id: string, updates: Partial<ShoppingItem>): Promise<ShoppingItem>;
+  
+  // Data management operations
+  exportHouseholdData(householdId: string): Promise<any>;
+  resetHouseholdData(householdId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -269,6 +273,39 @@ export class DatabaseStorage implements IStorage {
       .where(eq(shoppingItems.id, id))
       .returning();
     return item;
+  }
+
+  // Data management operations
+  async exportHouseholdData(householdId: string): Promise<any> {
+    // Get all household data
+    const household = await db.select().from(households).where(eq(households.id, householdId));
+    const members = await this.getHouseholdMembers(householdId);
+    const categoriesData = await this.getHouseholdCategories(householdId);
+    const transactionsData = await this.getHouseholdTransactions(householdId, 1000);
+    const budgetsData = await this.getHouseholdBudgetGoals(householdId, new Date().getMonth() + 1, new Date().getFullYear());
+    const shoppingData = await this.getHouseholdShoppingItems(householdId);
+
+    return {
+      exportDate: new Date().toISOString(),
+      appVersion: "1.0.0",
+      household: household[0],
+      members,
+      categories: categoriesData,
+      transactions: transactionsData,
+      budgetGoals: budgetsData,
+      shoppingItems: shoppingData,
+    };
+  }
+
+  async resetHouseholdData(householdId: string): Promise<void> {
+    // Delete all household data in correct order (respecting foreign key constraints)
+    await db.delete(shoppingItems).where(eq(shoppingItems.householdId, householdId));
+    await db.delete(budgetGoals).where(eq(budgetGoals.householdId, householdId));
+    await db.delete(transactions).where(eq(transactions.householdId, householdId));
+    await db.delete(categories).where(eq(categories.householdId, householdId));
+    
+    // Recreate default categories
+    await this.createDefaultCategories(householdId);
   }
 }
 

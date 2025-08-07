@@ -224,6 +224,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export household data
+  app.get('/api/households/:id/export', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const exportData = await storage.exportHouseholdData(id);
+      res.json(exportData);
+    } catch (error) {
+      console.error("Error exporting household data:", error);
+      res.status(500).json({ message: "Failed to export household data" });
+    }
+  });
+
+  // Reset household data
+  app.delete('/api/households/:id/reset', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.resetHouseholdData(id);
+      res.json({ message: "Household data reset successfully" });
+    } catch (error) {
+      console.error("Error resetting household data:", error);
+      res.status(500).json({ message: "Failed to reset household data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
