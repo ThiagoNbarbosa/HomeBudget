@@ -192,24 +192,26 @@ export default function AddTransactionDialog({
                         type="text"
                         placeholder="0,00"
                         className="pl-10"
-                        value={field.value}
+                        value={field.value ? 
+                          parseFloat(field.value).toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }) : ''
+                        }
                         onChange={(e) => {
                           let value = e.target.value;
                           
                           // Remove tudo que não é dígito
                           value = value.replace(/\D/g, '');
                           
+                          // Se vazio, define como 0
+                          if (!value) {
+                            field.onChange('');
+                            return;
+                          }
+                          
                           // Converte para centavos (divide por 100)
-                          const numericValue = parseInt(value || '0', 10) / 100;
-                          
-                          // Formata como moeda brasileira
-                          const formatted = numericValue.toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          });
-                          
-                          // Atualiza o campo com valor formatado para exibição
-                          e.target.value = formatted;
+                          const numericValue = parseInt(value, 10) / 100;
                           
                           // Salva o valor numérico para o formulário
                           field.onChange(numericValue.toString());
