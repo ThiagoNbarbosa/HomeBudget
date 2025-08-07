@@ -38,25 +38,25 @@ export default function Dashboard() {
 
   // Fetch analytics data
   const { data: analytics } = useQuery({
-    queryKey: ["/api/households", household?.id, "analytics"],
+    queryKey: [`/api/households/${household?.id}/analytics`],
     enabled: !!household?.id,
   });
 
   // Fetch recent transactions
   const { data: transactions } = useQuery({
-    queryKey: ["/api/households", household?.id, "transactions"],
+    queryKey: [`/api/households/${household?.id}/transactions`],
     enabled: !!household?.id,
   });
 
   // Fetch shopping items
   const { data: shoppingItems } = useQuery({
-    queryKey: ["/api/households", household?.id, "shopping"],
+    queryKey: [`/api/households/${household?.id}/shopping`],
     enabled: !!household?.id,
   });
 
   // Fetch budget data
   const { data: budgets } = useQuery({
-    queryKey: ["/api/households", household?.id, "budgets"],
+    queryKey: [`/api/households/${household?.id}/budgets`],
     enabled: !!household?.id,
   });
 

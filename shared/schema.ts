@@ -204,6 +204,8 @@ export const insertCategorySchema = createInsertSchema(categories).omit({
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
   id: true,
   createdAt: true,
+}).extend({
+  incomeSubtype: z.enum(["contra_cheque", "fgts", "descontos", "extra"]).optional(),
 });
 
 export const insertBudgetGoalSchema = createInsertSchema(budgetGoals).omit({
