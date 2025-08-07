@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
+import Shopping from "@/pages/shopping";
 import Transactions from "@/pages/transactions";
 import Goals from "@/pages/goals";
 import Profile from "@/pages/profile";
@@ -21,6 +22,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Dashboard} />
+          <Route path="/shopping" component={Shopping} />
           <Route path="/transactions" component={Transactions} />
           <Route path="/goals" component={Goals} />
           <Route path="/profile" component={Profile} />

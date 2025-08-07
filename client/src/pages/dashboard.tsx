@@ -21,11 +21,13 @@ import AddTransactionDialog from "@/components/AddTransactionDialog";
 import AddShoppingItemDialog from "@/components/AddShoppingItemDialog";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [isShoppingDialogOpen, setIsShoppingDialogOpen] = useState(false);
 
@@ -300,7 +302,12 @@ export default function Dashboard() {
         <section className="px-6 py-4 pb-24">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-slate-800">Próximas Compras</h3>
-            <Button variant="link" size="sm" className="text-blue-700 p-0 font-medium">
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="text-blue-700 p-0 font-medium"
+              onClick={() => navigate("/shopping")}
+            >
               Ver lista
             </Button>
           </div>
