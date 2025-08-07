@@ -2,6 +2,17 @@
 
 TTMS (Track, Target, Manage, Succeed) is a collaborative financial management application designed for couples to manage their household finances together. The application provides real-time expense tracking, budget goal setting, shopping list management, and financial analytics in a mobile-first interface. Built as a full-stack web application with modern React frontend and Express backend, TTMS enables couples to synchronize their financial activities and work toward shared financial goals.
 
+## Recent Changes (January 2025)
+
+✓ **Enhanced Transaction System**: Implemented specialized salary transaction handling with multiple input fields (Valor contra cheque, Valor FGTS, Valor descontos, Extra)
+✓ **Comprehensive Category System**: Added 15 predefined categories with emoji icons for better user experience
+  - **Expense Categories**: 🏠 Casa & Moradia, 🛒 Alimentação, 🚗 Transporte, 💡 Contas Básicas, ⚕️ Saúde, 📚 Educação, 👕 Vestuário, 🎬 Lazer & Entretenimento, 💅 Cuidados Pessoais, 📦 Outros
+  - **Income Categories**: 💰 Salário, 💼 Freelance, 📈 Investimentos, 🛍️ Vendas, 💎 Outras Receitas
+✓ **Dynamic Form Logic**: Salary transactions show specialized input fields with automatic total calculation (contra cheque + FGTS - descontos)
+✓ **Complete Analytics Dashboard**: Implemented comprehensive financial analytics with category spending, budget progress, and growth tracking
+✓ **Updated Navigation**: Changed from Goals to Analytics in bottom navigation (Início, Compras, Analytics, Perfil)
+✓ **Shopping List Enhancement**: Full CRUD functionality with priorities, external links, and completion tracking
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
