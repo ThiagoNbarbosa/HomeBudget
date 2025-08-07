@@ -164,6 +164,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/shopping', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      
+      // Validate the data first without conversion
       const validatedData = insertShoppingItemSchema.parse({
         ...req.body,
         userId,

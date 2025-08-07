@@ -71,8 +71,9 @@ export default function AddShoppingItemDialog({
     mutationFn: async (data: ShoppingItemForm) => {
       const response = await apiRequest("POST", "/api/shopping", {
         ...data,
-        estimatedPriceMin: data.estimatedPriceMin ? parseFloat(data.estimatedPriceMin) : null,
-        estimatedPriceMax: data.estimatedPriceMax ? parseFloat(data.estimatedPriceMax) : null,
+        // Send as strings, let the database handle decimal conversion
+        estimatedPriceMin: data.estimatedPriceMin || undefined,
+        estimatedPriceMax: data.estimatedPriceMax || undefined,
       });
       return response.json();
     },
