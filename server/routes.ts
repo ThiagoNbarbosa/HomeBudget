@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { seedDefaultCategories } from "./seedCategories";
 import {
   insertHouseholdSchema,
   insertTransactionSchema,
@@ -39,7 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Create default categories
-      await storage.createDefaultCategories(household.id);
+      await seedDefaultCategories(household.id);
       
       res.json(household);
     } catch (error) {

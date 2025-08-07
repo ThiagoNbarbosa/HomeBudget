@@ -55,6 +55,7 @@ export const userHouseholds = pgTable("user_households", {
 
 // Transaction types
 export const transactionTypeEnum = pgEnum("transaction_type", ["income", "expense"]);
+export const incomeSubtypeEnum = pgEnum("income_subtype", ["contra_cheque", "fgts", "descontos", "extra"]);
 
 // Categories
 export const categories = pgTable("categories", {
@@ -73,6 +74,7 @@ export const transactions = pgTable("transactions", {
   description: text("description").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   type: transactionTypeEnum("type").notNull(),
+  incomeSubtype: incomeSubtypeEnum("income_subtype"),
   categoryId: varchar("category_id").notNull().references(() => categories.id),
   householdId: varchar("household_id").notNull().references(() => households.id),
   userId: varchar("user_id").notNull().references(() => users.id),
