@@ -194,12 +194,42 @@ export default function AddShoppingItemDialog({
                   <FormItem>
                     <FormLabel>Preço Mín. (R$)</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0,00"
-                        {...field}
-                      />
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                          R$
+                        </span>
+                        <Input
+                          type="text"
+                          placeholder="0,00"
+                          className="pl-10"
+                          value={field.value ? 
+                            parseFloat(field.value).toLocaleString('pt-BR', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }) : ''
+                          }
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            
+                            // Remove tudo que não é dígito
+                            value = value.replace(/\D/g, '');
+                            
+                            // Se vazio, define como vazio
+                            if (!value) {
+                              field.onChange('');
+                              return;
+                            }
+                            
+                            // Converte para centavos (divide por 100)
+                            const numericValue = parseInt(value, 10) / 100;
+                            
+                            // Salva o valor numérico para o formulário
+                            field.onChange(numericValue.toString());
+                          }}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -213,12 +243,42 @@ export default function AddShoppingItemDialog({
                   <FormItem>
                     <FormLabel>Preço Máx. (R$)</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0,00"
-                        {...field}
-                      />
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                          R$
+                        </span>
+                        <Input
+                          type="text"
+                          placeholder="0,00"
+                          className="pl-10"
+                          value={field.value ? 
+                            parseFloat(field.value).toLocaleString('pt-BR', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }) : ''
+                          }
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            
+                            // Remove tudo que não é dígito
+                            value = value.replace(/\D/g, '');
+                            
+                            // Se vazio, define como vazio
+                            if (!value) {
+                              field.onChange('');
+                              return;
+                            }
+                            
+                            // Converte para centavos (divide por 100)
+                            const numericValue = parseInt(value, 10) / 100;
+                            
+                            // Salva o valor numérico para o formulário
+                            field.onChange(numericValue.toString());
+                          }}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
