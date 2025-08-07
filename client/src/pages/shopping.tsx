@@ -141,19 +141,7 @@ export default function Shopping() {
           </div>
         ) : (
           <>
-            {/* Add Item Card */}
-            <Card 
-              className="mb-6 cursor-pointer border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-                  <Plus className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-medium text-slate-800">Adicionar Item</h3>
-                <p className="text-sm text-slate-600 mt-1">Toque para adicionar um novo item à lista</p>
-              </CardContent>
-            </Card>
+            
 
             {/* Pending Items */}
             {pendingItems.length > 0 && (
