@@ -189,11 +189,33 @@ export default function AddTransactionDialog({
                         R$
                       </span>
                       <Input
-                        type="number"
-                        step="0.01"
+                        type="text"
                         placeholder="0,00"
                         className="pl-10"
-                        {...field}
+                        value={field.value}
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          
+                          // Remove tudo que não é dígito
+                          value = value.replace(/\D/g, '');
+                          
+                          // Converte para centavos (divide por 100)
+                          const numericValue = parseInt(value || '0', 10) / 100;
+                          
+                          // Formata como moeda brasileira
+                          const formatted = numericValue.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          });
+                          
+                          // Atualiza o campo com valor formatado para exibição
+                          e.target.value = formatted;
+                          
+                          // Salva o valor numérico para o formulário
+                          field.onChange(numericValue.toString());
+                        }}
+                        onBlur={field.onBlur}
+                        name={field.name}
                       />
                     </div>
                   </FormControl>
