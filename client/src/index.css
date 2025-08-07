@@ -1,6 +1,62 @@
+/* Landing Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-slate-50: #f8fafc;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+}
+
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Smooth animations for the landing page */
+.landing-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.landing-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom gradients */
+.bg-premium-gradient {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+}
+
+/* Typography enhancements */
+.font-display {
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
+}
+
+/* Backdrop blur enhancement */
+.backdrop-blur-premium {
+  backdrop-filter: blur(8px) saturate(120%);
+}
+
+/* Button enhancements */
+.btn-premium {
+  background: linear-gradient(135deg, var(--color-blue-700) 0%, var(--color-blue-800) 100%);
+  box-shadow: 0 4px 14px 0 rgba(29, 78, 216, 0.25);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-premium:hover {
+  background: linear-gradient(135deg, var(--color-blue-800) 0%, var(--color-blue-900) 100%);
+  box-shadow: 0 6px 20px 0 rgba(29, 78, 216, 0.35);
+  transform: translateY(-1px);
+}
 
 :root {
   --background: hsl(0, 0%, 100%);
