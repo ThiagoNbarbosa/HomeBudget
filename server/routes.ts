@@ -183,7 +183,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/shopping/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const item = await storage.updateShoppingItem(id, req.body);
+      
+      // Handle date conversion for purchasedDate
+      const updateData = { ...req.body };
+      if (updateData.purchasedDate && typeof updateData.purchasedDate === 'string') {
+        updateData.purchasedDate = new Date(updateData.purchasedDate);
+      }
+      
+      const item = await storage.updateShoppingItem(id, updateData);
       res.json(item);
     } catch (error) {
       console.error("Error updating shopping item:", error);
