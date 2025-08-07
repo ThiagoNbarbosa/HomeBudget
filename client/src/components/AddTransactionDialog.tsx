@@ -32,10 +32,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
+const incomeSubtypes = [
+  { value: "contra_cheque", label: "Valor contra cheque" },
+  { value: "fgts", label: "Valor FGTS" },
+  { value: "descontos", label: "Valor descontos" },
+  { value: "extra", label: "Extra" },
+] as const;
+
 const transactionSchema = z.object({
   description: z.string().min(1, "Descrição é obrigatória"),
   amount: z.string().min(1, "Valor é obrigatório"),
   type: z.enum(["income", "expense"]),
+  incomeSubtype: z.enum(["contra_cheque", "fgts", "descontos", "extra"]).optional(),
   categoryId: z.string().min(1, "Categoria é obrigatória"),
   householdId: z.string(),
 });
@@ -63,6 +71,7 @@ export default function AddTransactionDialog({
       description: "",
       amount: "",
       type: defaultType,
+      incomeSubtype: undefined,
       categoryId: "",
       householdId,
     },
@@ -122,7 +131,7 @@ export default function AddTransactionDialog({
   };
 
   const watchedType = form.watch("type");
-  const filteredCategories = categories?.filter((cat: any) => cat.type === watchedType) || [];
+  const filteredCategories = (categories as any[])?.filter((cat: any) => cat.type === watchedType) || [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -145,6 +154,7 @@ export default function AddTransactionDialog({
                     onValueChange={(value) => {
                       field.onChange(value);
                       form.setValue("categoryId", ""); // Reset category when type changes
+                      form.setValue("incomeSubtype", undefined); // Reset income subtype
                     }}
                     defaultValue={field.value}
                   >
@@ -162,6 +172,36 @@ export default function AddTransactionDialog({
                 </FormItem>
               )}
             />
+
+            {watchedType === "income" && (
+              <FormField
+                control={form.control}
+                name="incomeSubtype"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subtipo de Receita</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o subtipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {incomeSubtypes.map((subtype) => (
+                          <SelectItem key={subtype.value} value={subtype.value}>
+                            {subtype.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
@@ -233,18 +273,21 @@ export default function AddTransactionDialog({
                 <FormItem>
                   <FormLabel>Categoria</FormLabel>
                   <FormControl>
-                    <select
-                      value={field.value}
-                      onChange={field.onChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="">Selecione uma categoria</option>
-                      {filteredCategories.map((category: any) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredCategories.map((category: any) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            <div className="flex items-center space-x-2">
+                              <span>{category.icon}</span>
+                              <span>{category.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

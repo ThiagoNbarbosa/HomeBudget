@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, ShoppingCart, Target, User } from "lucide-react";
+import { Home, ShoppingCart, BarChart3, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function BottomNavigation() {
@@ -9,7 +9,7 @@ export default function BottomNavigation() {
   const navItems = [
     { path: "/", icon: Home, label: "Início" },
     { path: "/shopping", icon: ShoppingCart, label: "Compras" },
-    { path: "/goals", icon: Target, label: "Metas" },
+    { path: "/analytics", icon: BarChart3, label: "Analytics" },
     { path: "/profile", icon: User, label: "Perfil" },
   ];
 
